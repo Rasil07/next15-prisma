@@ -1,6 +1,6 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-// import { useHomeState } from "@/hooks/state";
+"use client";
+
+import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -10,12 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchAllPerson } from "@/lib/serverActions/person";
-import { Suspense } from "react";
+import { useHomeState } from "@/hooks/state";
 
-export default async function Home() {
-  const serverPeople = fetchAllPerson();
-  const people = await serverPeople;
+export default function Home() {
+  const { peoples, Dialogue, handleOpen } = useHomeState();
 
   return (
     <div className="bg-darkbg flex flex-col items-center">
@@ -25,37 +23,50 @@ export default async function Home() {
 
       <main className="p-[24] h-screen min-w-[1200px] max-w-[1200px]">
         <div className="w-full h-[50px]" />
-        <Suspense fallback>
-          <button
-            className="bg-primary text-sm
-         text-white rounded-sm py-[6px] w-fit px-[24px]"
-          >
-            ADD NEW PERSON
-          </button>
 
-          <section className="bg-white w-full min-h-16 rounded-sm">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>First Name</TableHead>
-                  <TableHead>Last Name</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Actions</TableHead>
+        <Button
+          className="bg-primary text-sm
+         text-white rounded-sm py-[6px] w-fit px-[24px]"
+          onClick={() => handleOpen(null)}
+        >
+          ADD NEW PERSON
+        </Button>
+
+        <section className="bg-white w-full min-h-16 rounded-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>First Name</TableHead>
+                <TableHead>Last Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>DOB</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {peoples.map((person) => (
+                <TableRow key={person.id}>
+                  <TableCell>{person.firstname}</TableCell>
+                  <TableCell>{person.lastname}</TableCell>
+                  <TableCell>{person.phone}</TableCell>
+                  <TableCell>{person?.dateOfBirth?.toString() || ""}</TableCell>
+
+                  <TableCell>
+                    <Button className="bg-accent text-white text-sm rounded-sm py-[6px] w-fit px-[24px]">
+                      Edit
+                    </Button>
+                    <Button className="bg-destructive text-white text-sm rounded-sm py-[6px] w-fit px-[24px]">
+                      Delete
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {people.map((person) => (
-                  <TableRow key={person.id}>
-                    <TableCell>Paid</TableCell>
-                    <TableCell>Credit Card</TableCell>
-                    <TableCell>$250.00</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </section>
-        </Suspense>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
       </main>
+
+      <Dialogue />
     </div>
   );
 }
