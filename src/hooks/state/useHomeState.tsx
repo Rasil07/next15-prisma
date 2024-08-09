@@ -93,16 +93,11 @@ export const useHomeState = () => {
         }
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[377px]   lg:h-3/5">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
+          <DialogTitle>Add person</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4"></div>
-        </div>
+        <form></form>
         <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>

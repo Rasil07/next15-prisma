@@ -16,12 +16,12 @@ export default function Home() {
   const { peoples, Dialogue, handleOpen } = useHomeState();
 
   return (
-    <div className="bg-darkbg flex flex-col items-center">
+    <div className="bg-darkbg w-full flex flex-col items-center">
       <header className="h-16 bg-primary px-[24] w-full flex items-center">
         <p className="text-xl text-white p-0 m-0 ">People</p>
       </header>
 
-      <main className="p-[24] h-screen min-w-[1200px] max-w-[1200px]">
+      <main className="p-[24] h-screen w-full lg:max-w-[1200px]">
         <div className="w-full h-[50px]" />
 
         <Button
