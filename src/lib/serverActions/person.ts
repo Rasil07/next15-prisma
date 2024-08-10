@@ -1,73 +1,53 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 export interface Person {
-  id: number;
+  id?: number;
   firstname: string;
   lastname: string;
   phone: string;
   dateOfBirth?: Date;
 }
 
-export const createPerson = async (formData: FormData): Promise<Person> => {
-  console.log({ formData });
-  const firstname = formData.get("firstname");
-  const lastname = formData.get("lastname");
-  const phone = formData.get("phone");
-  const dateOfBirth = formData.get("dateOfBirth");
+const PERSON_PATH = "/";
 
-  if (
-    typeof firstname !== "string" ||
-    typeof lastname !== "string" ||
-    typeof phone !== "string" ||
-    typeof dateOfBirth !== "string"
-  ) {
-    throw new Error("Invalid form data");
-  }
-
+export const createPerson = async (formData: Person): Promise<Person> => {
   const person = await prisma.person.create({
     data: {
-      firstname,
-      lastname,
-      phone,
-      dateOfBirth,
+      firstname: formData.firstname,
+      lastname: formData.lastname,
+      phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
     },
   });
+
+  revalidatePath(PERSON_PATH);
 
   return person as Person;
 };
 
-export async function updatePerson(formData: FormData): Promise<Person> {
-  const id = formData.get("id") as string;
-  const firstname = formData.get("firstname") as string;
-  const lastname = formData.get("lastname") as string;
-  const phone = formData.get("phone") as string;
-  const dateOfBirth = formData.get("dateOfBirth") as string;
-
-  if (!id || !firstname || !lastname || !phone) {
-    throw new Error("Invalid form data");
-  }
-
+export async function updatePerson(formData: Person): Promise<Person> {
   const updatedPerson = await prisma.person.update({
-    where: { id: parseInt(id) },
+    where: { id: formData.id },
     data: {
-      firstname,
-      lastname,
-      phone,
-      dateOfBirth,
+      ...formData,
     },
   });
 
+  revalidatePath(PERSON_PATH);
   return updatedPerson as Person;
 }
 
-export const deletePerson = async (id: string) =>
-  prisma.person.delete({ where: { id: parseInt(id) } });
+export const deletePerson = async (formData: FormData) => {
+  const id = parseInt(formData.get("id") as string, 10);
+  await prisma.person.delete({ where: { id: id } });
+  revalidatePath(PERSON_PATH);
+};
 
 export async function fetchAllPerson(): Promise<Person[]> {
   const peoples = await prisma.person.findMany();
-  console.log({ peoples });
   return peoples as Person[];
 }

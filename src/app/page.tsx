@@ -1,5 +1,6 @@
-"use client";
+"use server";
 
+import PersonForm from "@/components/shared/personForm";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -10,10 +11,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useHomeState } from "@/hooks/state";
+import { fetchAllPerson, deletePerson } from "@/lib/serverActions/person";
 
-export default function Home() {
-  const { peoples, Dialogue, handleOpen } = useHomeState();
+// import { useHomeState } from "@/hooks/state";
+
+function formatDateOfBirth(dateOfBirth?: string) {
+  const date = new Date(dateOfBirth || "");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based, so add 1
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export default async function Home() {
+  // const { peoples, Dialogue, handleOpen, handleDelete } = useHomeState();
+
+  const peoples = await fetchAllPerson();
 
   return (
     <div className="bg-darkbg w-full flex flex-col items-center">
@@ -24,13 +37,7 @@ export default function Home() {
       <main className="p-[24] h-screen w-full lg:max-w-[1200px]">
         <div className="w-full h-[50px]" />
 
-        <Button
-          className="bg-primary text-sm
-         text-white rounded-sm py-[6px] w-fit px-[24px]"
-          onClick={() => handleOpen(null)}
-        >
-          ADD NEW PERSON
-        </Button>
+        <PersonForm person={undefined} />
 
         <section className="bg-white w-full min-h-16 rounded-sm">
           <Table>
@@ -49,15 +56,21 @@ export default function Home() {
                   <TableCell>{person.firstname}</TableCell>
                   <TableCell>{person.lastname}</TableCell>
                   <TableCell>{person.phone}</TableCell>
-                  <TableCell>{person?.dateOfBirth?.toString() || ""}</TableCell>
-
                   <TableCell>
-                    <Button className="bg-accent text-white text-sm rounded-sm py-[6px] w-fit px-[24px]">
-                      Edit
-                    </Button>
-                    <Button className="bg-destructive text-white text-sm rounded-sm py-[6px] w-fit px-[24px]">
-                      Delete
-                    </Button>
+                    {formatDateOfBirth(person?.dateOfBirth?.toString()) || ""}
+                  </TableCell>
+
+                  <TableCell className="flex gap-4">
+                    <PersonForm person={person} />
+                    <form action={deletePerson}>
+                      <Button
+                        className="bg-destructive text-white text-sm rounded-sm py-[6px] w-fit px-[24px]"
+                        type="submit"
+                      >
+                        <input type="hidden" name="id" value={person.id} />
+                        Delete
+                      </Button>
+                    </form>
                   </TableCell>
                 </TableRow>
               ))}
@@ -66,7 +79,7 @@ export default function Home() {
         </section>
       </main>
 
-      <Dialogue />
+      {/* <Dialogue /> */}
     </div>
   );
 }
