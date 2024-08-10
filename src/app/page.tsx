@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/table";
 import { fetchAllPerson, deletePerson } from "@/lib/serverActions/person";
 
-// import { useHomeState } from "@/hooks/state";
-
 function formatDateOfBirth(dateOfBirth?: string) {
   const date = new Date(dateOfBirth || "");
   const year = date.getFullYear();
