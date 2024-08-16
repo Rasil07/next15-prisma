@@ -68,3 +68,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* .toast-success {
+  @apply bg-green-500 text-white;
+}
+
+.toast-error {
+  @apply bg-red-500 text-white;
+} */

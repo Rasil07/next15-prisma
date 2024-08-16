@@ -1,7 +1,7 @@
 "use server";
 
+import DeleteForm from "@/components/shared/deleteForm";
 import PersonForm from "@/components/shared/personForm";
-import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -60,7 +60,9 @@ export default async function Home() {
 
                   <TableCell className="flex gap-4">
                     <PersonForm person={person} />
-                    <form action={deletePerson}>
+
+                    <DeleteForm person={person} onSubmit={deletePerson} />
+                    {/* <form action={deletePerson}>
                       <Button
                         className="bg-destructive text-white text-sm rounded-sm py-[6px] w-fit px-[24px]"
                         type="submit"
@@ -68,7 +70,7 @@ export default async function Home() {
                         <input type="hidden" name="id" value={person.id} />
                         Delete
                       </Button>
-                    </form>
+                    </form> */}
                   </TableCell>
                 </TableRow>
               ))}

@@ -2,7 +2,7 @@
 
 import { personSchema } from "@/lib/formResolvers/person";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -12,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { createPerson, Person, updatePerson } from "@/lib/serverActions/person";
+import { useToast } from "../ui/use-toast";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 function formatDateOfBirth(dateOfBirth: string) {
   const date = new Date(dateOfBirth);
@@ -40,6 +43,9 @@ type PersonFormProp = {
 const PersonForm = ({ person }: PersonFormProp) => {
   const [modalOpen, setModalOpen] = React.useState(false);
 
+  const [isLoading, setLoading] = useState(false);
+
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof personSchema>>({
     resolver: zodResolver(personSchema),
     defaultValues: {
@@ -51,6 +57,7 @@ const PersonForm = ({ person }: PersonFormProp) => {
   });
 
   const onFormSubmit = async (data: z.infer<typeof personSchema>) => {
+    setLoading(true);
     let payload: Person = {
       ...data,
       dateOfBirth: new Date(data.dateOfBirth),
@@ -63,10 +70,13 @@ const PersonForm = ({ person }: PersonFormProp) => {
       };
 
       await updatePerson(payload);
+      toast({ title: "Person updated successfully." });
     } else {
       await createPerson(payload);
+      toast({ title: "Person added successfully." });
     }
 
+    setLoading(false);
     setModalOpen(false);
   };
 
@@ -156,7 +166,17 @@ const PersonForm = ({ person }: PersonFormProp) => {
               >
                 Close
               </Button>
-              <Button type="submit">{person ? "Save" : "Add"}</Button>
+
+              {isLoading ? (
+                <Button
+                  disabled
+                  className="text-white text-sm rounded-sm py-[6px] w-fit px-[24px]"
+                >
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                </Button>
+              ) : (
+                <Button type="submit">{person ? "Save" : "Add"}</Button>
+              )}
             </DialogFooter>
           </form>
         </Form>
